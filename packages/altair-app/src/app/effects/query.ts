@@ -16,7 +16,7 @@ import {
   ElectronAppService,
   EnvironmentService,
   PreRequestService,
-  SubscriptionFactoryService
+  SubscriptionProviderRegistryService,
 } from '../services';
 import * as fromRoot from '../store';
 
@@ -34,6 +34,7 @@ import * as streamActions from '../store/stream/stream.action';
 import { downloadJson, downloadData, copyToClipboard, openFile } from '../utils';
 import { debug } from '../utils/logger';
 import { generateCurl } from 'app/utils/curl';
+import { WEBSOCKET_PROVIDER_ID } from 'app/services/subscriptions/providers/ws';
 
 interface EffectResponseData {
   state: fromRoot.State;
@@ -542,7 +543,10 @@ export class QueryEffects {
               return subscriptionErrorHandler(err, 'Your connection parameters is not a valid JSON object.');
             }
 
-            const SubscriptionProviderClass = this.subscriptionFactoryService.getSubscriptionProvider('websocket');
+            const subscriptionProviderId = response.data.query.subscriptionProviderId || WEBSOCKET_PROVIDER_ID;
+            const {
+              providerClass: SubscriptionProviderClass
+            } = this.subscriptionProviderRegistryService.getProviderData(subscriptionProviderId);
             const subscriptionProvider = new SubscriptionProviderClass(
               subscriptionUrl,
               connectionParams,
@@ -891,7 +895,7 @@ export class QueryEffects {
       private electronAppService: ElectronAppService,
       private environmentService: EnvironmentService,
       private preRequestService: PreRequestService,
-      private subscriptionFactoryService: SubscriptionFactoryService,
+      private subscriptionProviderRegistryService: SubscriptionProviderRegistryService,
       private store: Store<fromRoot.State>
     ) {}
 
