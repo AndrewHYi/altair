@@ -91,6 +91,7 @@ export class WindowComponent implements OnInit {
   sidebarPluginsData$: Observable<PluginComponentData[]>;
 
   @Input() windowId: string;
+  @Input() isActive = false;
 
   apiUrl = '';
   query = '';
